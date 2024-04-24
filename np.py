@@ -27,12 +27,13 @@ class Encoder(nn.Module):
         self.r_dim = r_dim
 
 
-        self.conv2d_td = TimeDistributed(nn.Conv2d(4, 20, kernel_size=(3, 3), padding='same'), batch_first=True)
-        self.avg_pool_td = TimeDistributed(nn.AvgPool2d(2), batch_first=True)
-        self.global_avg_pool_td = TimeDistributed(nn.AdaptiveAvgPool2d(1), batch_first=True)
-        self.lstms = nn.LSTM(25, 25, batch_first=True)
+        self.conv2d = nn.Conv2d(1, 32, kernel_size=3, stride=1, padding=1)
+        self.avg_pool = nn.AvgPool2d(kernel_size=2, stride=2)
+        self.global_avg_pool = nn.AdaptiveAvgPool2d(1)
         self.relu = nn.ReLU(inplace=True)
         self.hidden = nn.Linear(1*96*144, r_dim)
+
+
         layers = [nn.Linear(x_dim + y_dim, h_dim),
                   nn.ReLU(inplace=True),
                   nn.Linear(h_dim, h_dim),
@@ -46,7 +47,7 @@ class Encoder(nn.Module):
         # y has shape: (batch_size, 1, height, width)
         
         # Process spatial features with convolutional and pooling layers
-        x = self.conv2d_td(x)
+        x = self.conv2d(x)
         x = self.avg_pool_td(x)
         x = self.global_avg_pool_td(x)
         x = x.view(x.size(0), x.size(1), -1)  # Reshape for LSTM: Flatten spatial dimensions
