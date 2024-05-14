@@ -158,3 +158,7 @@ def get_rmse(truth, pred):
     weights = np.cos(np.deg2rad(truth.lat))
     return np.sqrt(((truth - pred)**2).weighted(weights).mean(['lat', 'lon'])).data
 
+
+###############################################################
+
+
